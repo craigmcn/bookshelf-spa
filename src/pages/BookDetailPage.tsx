@@ -48,7 +48,7 @@ export default function BookDetailPage() {
     if (reading) {
       setStatus(reading.status);
       setRating(reading.rating);
-      setReview("");
+      setReview(reading.review ?? "");
     } else {
       setStatus("want_to_read");
       setRating(null);
@@ -80,6 +80,7 @@ export default function BookDetailPage() {
                   id: reading.id,
                   status: reading.status,
                   rating: reading.rating,
+                  review: reading.review,
                 },
               }
             : b,
@@ -97,6 +98,7 @@ export default function BookDetailPage() {
                   id: reading.id,
                   status: reading.status,
                   rating: reading.rating,
+                  review: reading.review,
                 },
               }
             : b,
