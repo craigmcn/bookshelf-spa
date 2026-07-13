@@ -123,6 +123,100 @@ export async function mockReadings(page: Page, readings = [sampleReading]) {
   });
 }
 
+export const adminFixtures = {
+  dashboard: {
+    total_users: 12,
+    total_books: 34,
+    total_readings: 56,
+    popular_books: [
+      {
+        id: 1,
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        readings_count: 8,
+      },
+      {
+        id: 2,
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        readings_count: 5,
+      },
+    ],
+  },
+  users: {
+    users: [
+      { id: 1, email: "member@example.com", roles: ["member"] },
+      { id: 2, email: "mod@example.com", roles: ["member", "moderator"] },
+    ],
+    available_roles: ["member", "moderator", "admin"],
+  },
+  readings: [
+    {
+      id: 10,
+      review: "A timeless classic.",
+      status: "finished",
+      rating: 5,
+      deleted_at: null,
+      updated_at: "2025-01-15T12:00:00Z",
+      user: { id: 1, email: "member@example.com" },
+      book: {
+        id: 1,
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+      },
+    },
+    {
+      id: 11,
+      review: "Not my taste.",
+      status: "finished",
+      rating: 2,
+      deleted_at: "2025-01-20T08:00:00Z",
+      updated_at: "2025-01-20T08:00:00Z",
+      user: { id: 1, email: "member@example.com" },
+      book: {
+        id: 2,
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+      },
+    },
+  ],
+};
+
+export async function mockAdminDashboard(page: Page) {
+  await page.route(`${API}/admin`, (route) => {
+    route.fulfill({ json: adminFixtures.dashboard });
+  });
+}
+
+export async function mockAdminUsers(page: Page) {
+  await page.route(`${API}/admin/users`, (route) => {
+    const method = route.request().method();
+    if (method === "GET") {
+      route.fulfill({ json: adminFixtures.users });
+    } else if (method === "PATCH") {
+      route.continue();
+    } else {
+      route.continue();
+    }
+  });
+}
+
+export async function mockAdminUserUpdate(
+  page: Page,
+  userId: number,
+  updatedUser: (typeof adminFixtures.users.users)[number],
+) {
+  await page.route(`${API}/admin/users/${userId}`, (route) => {
+    route.fulfill({ json: { user: updatedUser } });
+  });
+}
+
+export async function mockAdminReadings(page: Page) {
+  await page.route(`${API}/admin/readings`, (route) => {
+    route.fulfill({ json: { readings: adminFixtures.readings } });
+  });
+}
+
 export async function mockReadingMutations(
   page: Page,
   readingId: number,
