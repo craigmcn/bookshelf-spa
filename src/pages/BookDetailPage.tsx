@@ -38,6 +38,7 @@ export default function BookDetailPage() {
         if (fetched.user_reading) {
           setStatus(fetched.user_reading.status);
           setRating(fetched.user_reading.rating);
+          setReview(fetched.user_reading.review ?? "");
         }
       })
       .catch(() => setError("Book not found."))

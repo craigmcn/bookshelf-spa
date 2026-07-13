@@ -84,8 +84,7 @@ export async function mockBookDetail(
           book: {
             ...sampleBook,
             id: bookId,
-            user_reading:
-              options.userReading !== undefined ? options.userReading : null,
+            user_reading: options.userReading ?? null,
           },
         },
       });
@@ -193,8 +192,6 @@ export async function mockAdminUsers(page: Page) {
     const method = route.request().method();
     if (method === "GET") {
       route.fulfill({ json: adminFixtures.users });
-    } else if (method === "PATCH") {
-      route.continue();
     } else {
       route.continue();
     }
