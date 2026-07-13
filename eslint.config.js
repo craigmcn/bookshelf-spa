@@ -23,5 +23,14 @@ export default tseslint.config(
       ...jsxA11y.configs.recommended.rules,
     },
   },
+  {
+    files: ["e2e/**/*.ts"],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+    rules: {
+      "jsx-a11y/anchor-is-valid": "off",
+    },
+  },
   prettier,
 );

@@ -10,6 +10,7 @@ export type UserReading = {
   id: number;
   status: string;
   rating: number | null;
+  review: string | null;
 };
 
 export type BookWithReading = Book & { user_reading?: UserReading | null };
