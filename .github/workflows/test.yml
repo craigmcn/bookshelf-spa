@@ -19,3 +19,69 @@ jobs:
       - run: yarn lint
       - run: yarn build
       - run: yarn test --run
+
+  e2e-integration:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout bookshelf-spa
+        uses: actions/checkout@v4
+        with:
+          path: bookshelf-spa
+
+      - name: Checkout bookshelf-api
+        uses: actions/checkout@v4
+        with:
+          repository: craigmcn/bookshelf-api
+          path: bookshelf-api
+
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libpq-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: bookshelf-api
+
+      - run: corepack enable
+        working-directory: bookshelf-spa
+
+      - name: Install JS packages
+        run: yarn install --immutable
+        working-directory: bookshelf-spa
+
+      - name: Install Playwright browsers
+        run: yarn playwright install --with-deps chromium
+        working-directory: bookshelf-spa
+
+      - name: Run real-backend Playwright e2e tests
+        env:
+          BOOKSHELF_API_DIR: ${{ github.workspace }}/bookshelf-api
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          CI: true
+        run: yarn test:e2e:integration
+        working-directory: bookshelf-spa
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-real-api
+          path: bookshelf-spa/playwright-report-real-api/
+          retention-days: 14

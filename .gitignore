@@ -26,5 +26,6 @@ yarn-error.log*
 
 # Playwright
 playwright-report/
+playwright-report-real-api/
 test-results/
 .yarn/install-state.gz

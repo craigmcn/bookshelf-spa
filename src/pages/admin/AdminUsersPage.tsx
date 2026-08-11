@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "../../api/admin";
-import type { AdminUser } from "../../types";
+import type { AdminUser, Role } from "../../types";
 
 type UsersData = {
   users: AdminUser[];
-  available_roles: string[];
+  available_roles: Role[];
 };
 
 export default function AdminUsersPage() {
@@ -34,9 +34,9 @@ export default function AdminUsersPage() {
     setSaving(user.id);
     try {
       const roleNames = pendingRoles[user.id] ?? [];
-      const roleIds = roleNames
-        .map((name) => data.available_roles.indexOf(name) + 1)
-        .filter((id) => id > 0);
+      const roleIds = data.available_roles
+        .filter((role) => roleNames.includes(role.name))
+        .map((role) => role.id);
       const { user: updated } = await adminApi.updateUser(user.id, roleIds);
       setData((d) =>
         d
@@ -104,19 +104,21 @@ export default function AdminUsersPage() {
               <td>
                 <div className="d-flex gap-2 flex-wrap">
                   {data.available_roles.map((role) => (
-                    <div key={role} className="form-check mb-0">
+                    <div key={role.id} className="form-check mb-0">
                       <input
                         type="checkbox"
                         className="form-check-input"
-                        id={`role-${user.id}-${role}`}
-                        checked={(pendingRoles[user.id] ?? []).includes(role)}
-                        onChange={() => toggleRole(user.id, role)}
+                        id={`role-${user.id}-${role.name}`}
+                        checked={(pendingRoles[user.id] ?? []).includes(
+                          role.name,
+                        )}
+                        onChange={() => toggleRole(user.id, role.name)}
                       />
                       <label
                         className="form-check-label small"
-                        htmlFor={`role-${user.id}-${role}`}
+                        htmlFor={`role-${user.id}-${role.name}`}
                       >
-                        {role}
+                        {role.name}
                       </label>
                     </div>
                   ))}
