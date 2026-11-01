@@ -2,6 +2,16 @@
 
 React 19 frontend for the community bookshelf app. Pairs with `bookshelf-api` (Rails JSON API backend).
 
+## Bookshelf family
+
+bookshelf-spa + bookshelf-api together are one of three apps that should be **indistinguishable to a user** and keep **feature parity**:
+
+- **community_bookshelf**: out-of-the-box Rails with Turbo/Stimulus. The reference implementation, and essentially feature complete.
+- **bookshelf-islands**: the same app, with Turbo/Stimulus replaced by React islands.
+- **bookshelf-api + bookshelf-spa** (this repo): an out-of-the-box Rails API plus this React SPA. The API is moving to community_bookshelf's `/api/v1` contract (`doc/openapi.yaml` there; bookshelf-api#84, this repo's #40), which is backend-neutral, so a non-Rails backend (e.g. PHP) could replace bookshelf-api later.
+
+New features, processes or architecture in any of them get an equivalent in the others. User-visible copy and flows follow the canonical forms decided in community_bookshelf#224. The shared e2e scenarios, by exact `test()` name, are listed in community_bookshelf's `doc/e2e_parity_scenarios.md`.
+
 ## Tech Stack
 
 | Layer           | Choice                                                                   |
@@ -60,7 +70,10 @@ Two separate Playwright configs, intentionally not combined:
   (`workers: 1`), since it mutates a shared Postgres DB with no per-test transaction
   rollback. `bin/e2e_server`'s health-check target is `/books`, not `/` — `bookshelf-api`
   is API-only and has no root route, so `/` always 404s and would never satisfy
-  Playwright's default readiness check.
+  Playwright's default readiness check. In CI, the `e2e-integration` job checks out the private
+  `bookshelf-api` repo with the `BOOKSHELF_API_READ_TOKEN` repo secret (a fine-grained PAT
+  with Contents: read on it). The default `GITHUB_TOKEN` can only read this repo, so the
+  job fails with a clear error until that secret exists.
 
 **Known gap found via the real-api suite (fixed as part of adding it, 2026-08):**
 `AdminUsersPage`'s "Save" button used to compute role IDs from the alphabetically-sorted

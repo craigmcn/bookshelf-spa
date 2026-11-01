@@ -39,10 +39,22 @@ jobs:
         with:
           path: bookshelf-spa
 
+      # bookshelf-api is private, and this workflow's GITHUB_TOKEN can only read this
+      # repo, so the checkout needs a fine-grained token with Contents: read on it.
+      - name: Require BOOKSHELF_API_READ_TOKEN
+        env:
+          TOKEN: ${{ secrets.BOOKSHELF_API_READ_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::Add a BOOKSHELF_API_READ_TOKEN repo secret (fine-grained PAT, Contents: read on craigmcn/bookshelf-api)."
+            exit 1
+          fi
+
       - name: Checkout bookshelf-api
         uses: actions/checkout@v4
         with:
           repository: craigmcn/bookshelf-api
+          token: ${{ secrets.BOOKSHELF_API_READ_TOKEN }}
           path: bookshelf-api
 
       - name: Install packages
