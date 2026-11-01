@@ -147,7 +147,11 @@ export const adminFixtures = {
       { id: 1, email: "member@example.com", roles: ["member"] },
       { id: 2, email: "mod@example.com", roles: ["member", "moderator"] },
     ],
-    available_roles: ["member", "moderator", "admin"],
+    available_roles: [
+      { id: 1, name: "member" },
+      { id: 2, name: "moderator" },
+      { id: 3, name: "admin" },
+    ],
   },
   readings: [
     {

@@ -35,6 +35,11 @@ export type AdminUser = {
   roles: string[];
 };
 
+export type Role = {
+  id: number;
+  name: string;
+};
+
 export type AdminReading = {
   id: number;
   review: string;

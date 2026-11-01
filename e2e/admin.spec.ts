@@ -92,7 +92,9 @@ test.describe("Admin users page", () => {
     const { users: userList, available_roles } = adminFixtures.users;
     for (const user of userList) {
       for (const role of available_roles) {
-        await expect(page.locator(`#role-${user.id}-${role}`)).toBeVisible();
+        await expect(
+          page.locator(`#role-${user.id}-${role.name}`),
+        ).toBeVisible();
       }
     }
   });
